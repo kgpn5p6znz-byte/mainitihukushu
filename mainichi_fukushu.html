@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f7fb">
+<title>まいにち復習</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#202534;--muted:#697386;--line:#e5e8ef;--blue:#405cf5;--blue2:#edf0ff;--green:#16845b;--red:#c34444;--shadow:0 8px 24px rgba(31,43,74,.06)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+header{padding:26px 18px 18px;background:linear-gradient(135deg,#e9edff,#f6f7fb 75%)}.wrap{max-width:760px;margin:auto}h1{font-size:27px;margin:0 0 4px;letter-spacing:-.5px}.sub{color:var(--muted);font-size:14px}
+main{padding:0 14px 48px}.tabs{display:flex;gap:8px;margin:10px 0 16px}.tab{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 8px;font-weight:700;color:var(--muted)}.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;margin-bottom:13px;box-shadow:var(--shadow)}h2{font-size:18px;margin:0 0 12px}h3{font-size:16px;margin:0 0 5px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 10px}.num{font-size:24px;font-weight:800}.stat-label{font-size:12px;color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);font-weight:650;margin:10px 0 5px}input,textarea,select{width:100%;font:inherit;padding:11px 12px;border:1px solid #d9deea;border-radius:11px;background:#fff;color:var(--ink);outline:none}input:focus,textarea:focus,select:focus{border-color:var(--blue)}textarea{resize:vertical;min-height:76px}.row{display:flex;gap:9px}.row>*{flex:1;min-width:0}.btn{border:0;border-radius:11px;background:var(--blue);color:white;font-weight:750;font-size:14px;padding:11px 14px;cursor:pointer}.btn.secondary{background:var(--blue2);color:var(--blue)}.btn.ghost{background:#f0f2f7;color:#454e61}.btn.danger{background:#fff0f0;color:var(--red)}.btn.small{padding:8px 10px;font-size:12px}.full{width:100%;margin-top:12px}.item{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:9px;background:#fff}.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.item p{margin:5px 0 10px;color:var(--muted);font-size:13px;white-space:pre-wrap}.pill{display:inline-block;border-radius:99px;padding:3px 8px;font-size:11px;font-weight:750;background:#edf0ff;color:#405cf5}.pill.late{background:#fff0e8;color:#ad4a12}.pill.done{background:#e5f7ee;color:#16845b}.actions{display:flex;gap:7px;flex-wrap:wrap}.empty{padding:19px 10px;text-align:center;color:var(--muted);font-size:14px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px}.hint{color:var(--muted);font-size:12px;margin:7px 0 0}.checkrow{display:flex;gap:10px;align-items:flex-start}.checkrow input{width:20px;height:20px;margin-top:2px;accent-color:var(--blue);flex:none}.checkrow .tasktext{flex:1}.tasktext p{margin:3px 0 0}.strike{text-decoration:line-through;color:#8991a1}.footer{font-size:12px;color:var(--muted);text-align:center;padding:10px}
+@media(min-width:620px){main{padding-left:20px;padding-right:20px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:13px}.two-col .card{height:fit-content}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>📚 まいにち復習</h1><div class="sub">忘れる前に、ちょっとずつ思い出す。</div></div></header>
+<main class="wrap">
+  <nav class="tabs" aria-label="メニュー">
+    <button class="tab active" data-tab="today">今日やること</button>
+    <button class="tab" data-tab="reviews">復習を登録</button>
+    <button class="tab" data-tab="tasks">タスク管理</button>
+  </nav>
+  <section id="today" class="panel active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="dueCount">0</div><div class="stat-label">今日の復習</div></div>
+      <div class="stat"><div class="num" id="taskCount">0</div><div class="stat-label">未完了タスク</div></div>
+      <div class="stat"><div class="num" id="doneCount">0</div><div class="stat-label">今日完了</div></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>🔁 今日の復習</h2><span class="pill" id="todayDate"></span></div>
+      <div id="dueList"></div>
+    </div>
+    <div class="card">
+      <div class="section-title"><h2>✅ 今日のタスク</h2><button class="btn secondary small" onclick="switchTab('tasks')">＋ 追加</button></div>
+      <div id="todayTasks"></div>
+    </div>
+  </section>
+  <section id="reviews" class="panel">
+    <div class="card">
+      <h2>復習する内容を登録</h2>
+      <p class="hint">授業・動画・問題など、あとで思い出したい内容を登録。登録した翌日から復習予定に入ります。</p>
+      <form id="reviewForm">
+        <label for="rTitle">内容・テーマ *</label><input id="rTitle" required maxlength="120" placeholder="例：数学Ⅱ 対数関数">
+        <label for="rDetail">メモ（任意）</label><textarea id="rDetail" maxlength="500" placeholder="例：底の変換、真数条件を確認"></textarea>
+        <label for="rDate">学習した日</label><input id="rDate" type="date" required>
+        <button class="btn full" type="submit">復習スケジュールに追加</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>登録済みの復習テーマ</h2><div id="allReviews"></div>
+    </div>
+  </section>
+  <section id="tasks" class="panel">
+    <div class="card">
+      <h2>今日やるタスクを追加</h2>
+      <form id="taskForm">
+        <label for="tTitle">やること *</label><input id="tTitle" required maxlength="120" placeholder="例：Vintage 30問">
+        <div class="row"><div><label for="tDate">日付</label><input id="tDate" type="date" required></div><div><label for="tCategory">教科・分類</label><select id="tCategory"><option>その他</option><option>数学</option><option>英語</option><option>物理</option><option>化学</option><option>学校課題</option><option>生活</option></select></div></div>
+        <label for="tDetail">メモ（任意）</label><input id="tDetail" maxlength="200" placeholder="例：間違えた問題に印をつける">
+        <button class="btn full" type="submit">タスクを追加</button>
+      </form>
+    </div>
+    <div class="card"><div class="section-title"><h2>タスク一覧</h2><select id="taskFilter" style="max-width:145px"><option value="open">未完了</option><option value="all">すべて</option><option value="done">完了済み</option></select></div><div id="allTasks"></div></div>
+    <div class="card">
+      <h2>データのバックアップ</h2>
+      <p class="hint">データはこのブラウザ内に保存されます。端末変更・ブラウザのデータ削除に備えて、ときどき書き出してください。</p>
+      <div class="row"><button class="btn secondary" type="button" id="exportBtn">データを書き出す</button><label class="btn ghost" style="text-align:center;margin:0;cursor:pointer">読み込む<input id="importFile" type="file" accept="application/json" style="display:none"></label></div>
+    </div>
+  </section>
+  <div class="footer">保存先：この端末のブラウザ内（アカウント同期・通知はありません）</div>
+</main>
+<script>
+const KEY='mainichiFukushu_v1';
+const $=id=>document.getElementById(id);
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const addDays=(iso,n)=>{const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const fmt=iso=>iso?new Date(iso+'T12:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'numeric',day:'numeric'}):'日付なし';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+let data={reviews:[],tasks:[],dailyDone:{}};
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&Array.isArray(saved.reviews)&&Array.isArray(saved.tasks))data={...data,...saved}}catch(e){}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function switchTab(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id))}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+function nextDue(r){return r.nextDue||addDays(r.learnedAt,1)}
+function stageLabel(stage){return ['翌日','1週間後','1か月後'][Math.min(stage,2)]||'1か月後'}
+function reviewCard(r,showAction=true){const due=nextDue(r),late=due<todayISO();return `<div class="item"><div class="item-top"><div><h3>${esc(r.title)}</h3><span class="pill ${late?'late':''}">${late?'期限超過':stageLabel(r.stage)}・${fmt(due)}</span></div></div>${r.detail?`<p>${esc(r.detail)}</p>`:''}<div class="actions">${showAction&&due<=todayISO()?`<button class="btn small" onclick="completeReview('${r.id}')">復習完了</button>`:''}<button class="btn ghost small" onclick="editReview('${r.id}')">編集</button><button class="btn danger small" onclick="deleteReview('${r.id}')">削除</button></div></div>`}
+function completeReview(id){const r=data.reviews.find(x=>x.id===id);if(!r)return;const d=todayISO();if(r.stage===0){r.stage=1;r.nextDue=addDays(d,7)}else if(r.stage===1){r.stage=2;r.nextDue=addDays(d,30)}else{r.stage=2;r.nextDue=addDays(d,30)}r.lastDone=d;data.dailyDone[d]=(data.dailyDone[d]||0)+1;save()}
+function deleteReview(id){if(confirm('この復習テーマを削除する？')){data.reviews=data.reviews.filter(x=>x.id!==id);save()}}
+function editReview(id){const r=data.reviews.find(x=>x.id===id);if(!r)return;const title=prompt('内容・テーマ',r.title);if(title===null)return;if(!title.trim())return alert('内容を入力してね');const detail=prompt('メモ（空欄でもOK）',r.detail||'');if(detail===null)return;r.title=title.trim();r.detail=detail.trim();save()}
+function toggleTask(id,checked){const t=data.tasks.find(x=>x.id===id);if(t){t.done=checked;t.doneAt=checked?todayISO():null;save()}}
+function taskCard(t){return `<div class="item"><div class="checkrow"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}',this.checked)" aria-label="完了"><div class="tasktext ${t.done?'strike':''}"><strong>${esc(t.title)}</strong><div><span class="pill">${esc(t.category||'その他')}</span> <span class="hint">${fmt(t.date)}</span></div>${t.detail?`<p>${esc(t.detail)}</p>`:''}</div><button class="btn danger small" onclick="deleteTask('${t.id}')">削除</button></div></div>`}
+function deleteTask(id){if(confirm('このタスクを削除する？')){data.tasks=data.tasks.filter(t=>t.id!==id);save()}}
+function render(){const d=todayISO();$('todayDate').textContent=fmt(d);const due=data.reviews.filter(r=>nextDue(r)<=d).sort((a,b)=>nextDue(a).localeCompare(nextDue(b)));const todayTasks=data.tasks.filter(t=>t.date===d&&!t.done);const openTasks=data.tasks.filter(t=>!t.done);$('dueCount').textContent=due.length;$('taskCount').textContent=openTasks.length;$('doneCount').textContent=data.dailyDone[d]||0;
+$('dueList').innerHTML=due.length?due.map(r=>reviewCard(r)).join(''):'<div class="empty">今日の復習はゼロ！🎉<br>復習テーマを登録すると、ここに予定が出るよ。</div>';
+$('todayTasks').innerHTML=todayTasks.length?todayTasks.map(taskCard).join(''):'<div class="empty">今日の未完了タスクはなし！<br>追加するなら「タスク管理」へ。</div>';
+$('allReviews').innerHTML=data.reviews.length?data.reviews.slice().sort((a,b)=>nextDue(a).localeCompare(nextDue(b))).map(r=>reviewCard(r,false)).join(''):'<div class="empty">まだ登録されていません。</div>';
+const f=$('taskFilter').value;let tasks=data.tasks.slice().sort((a,b)=>a.date.localeCompare(b.date));if(f==='open')tasks=tasks.filter(t=>!t.done);if(f==='done')tasks=tasks.filter(t=>t.done);$('allTasks').innerHTML=tasks.length?tasks.map(taskCard).join(''):'<div class="empty">該当するタスクはありません。</div>'}
+$('reviewForm').addEventListener('submit',e=>{e.preventDefault();const learnedAt=$('rDate').value;data.reviews.push({id:uid(),title:$('rTitle').value.trim(),detail:$('rDetail').value.trim(),learnedAt,stage:0,nextDue:addDays(learnedAt,1)});e.target.reset();$('rDate').value=todayISO();save();switchTab('today')});
+$('taskForm').addEventListener('submit',e=>{e.preventDefault();data.tasks.push({id:uid(),title:$('tTitle').value.trim(),date:$('tDate').value,category:$('tCategory').value,detail:$('tDetail').value.trim(),done:false});e.target.reset();$('tDate').value=todayISO();save();switchTab('today')});
+$('taskFilter').addEventListener('change',render);
+$('exportBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mainichi-fukushu-backup.json';a.click();URL.revokeObjectURL(a.href)});
+$('importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const x=JSON.parse(await file.text());if(!Array.isArray(x.reviews)||!Array.isArray(x.tasks))throw Error();if(confirm('今のデータを読み込んだデータに置き換える？')){data={reviews:x.reviews,tasks:x.tasks,dailyDone:x.dailyDone||{}};save();alert('読み込みました！')}}catch(err){alert('ファイルを読み込めませんでした。バックアップJSONを選んでね。')}e.target.value=''});
+$('rDate').value=todayISO();$('tDate').value=todayISO();render();
+</script>
+</body></html>
